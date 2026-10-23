@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Dashboard | Predictive Maintenance</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f3f6fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+
+        .page-title {
+            color: #2457d6;
+            font-weight: 700;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+            height: 100%;
+            text-align: center;
+        }
+
+        .metric-value {
+            color: #2457d6;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .metric-name {
+            color: #555;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container dashboard-container">
+
+    <div class="text-center mb-5">
+        <h1 class="page-title">Predictive Maintenance Dashboard</h1>
+        <p class="text-muted">
+            Machine failure prediction model evaluation
+        </p>
+    </div>
+
+    <div class="row g-4">
+        {% for name, value in metrics.items() %}
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="metric-card">
+                <div class="metric-name">{{ name }}</div>
+                <div class="metric-value">{{ value }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="alert alert-info mt-5">
+        <strong>Note:</strong> These metrics are from the model's
+        previously recorded evaluation. They are not recalculated
+        when this dashboard opens.
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('home') }}"
+           class="btn btn-primary me-2 mb-2">
+            Individual Prediction
+        </a>
+
+        <a href="{{ url_for('batch_predict') }}"
+           class="btn btn-success mb-2">
+            Batch Prediction
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

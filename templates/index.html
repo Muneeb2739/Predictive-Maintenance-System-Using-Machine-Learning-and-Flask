@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Predictive Maintenance System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f2f5fa;
+            font-family: Arial, sans-serif;
+            color: #1f2937;
+        }
+
+        .main-card {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 35px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-title {
+            color: #2457d6;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #64748b;
+        }
+
+        .section-title {
+            color: #244bb5;
+            font-weight: 700;
+            margin: 25px 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background: #2864e8;
+            border-color: #2864e8;
+            font-weight: 600;
+            padding: 13px;
+        }
+
+        .result-card {
+            border: 1px solid #86efac;
+            background: #dcfce7;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+
+        .result-title {
+            color: #166534;
+            font-weight: 700;
+        }
+
+        .error-card {
+            margin-top: 20px;
+        }
+
+        .footer-text {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="main-card">
+
+        <header class="text-center mb-4">
+            <h1 class="page-title">Predictive Maintenance System</h1>
+
+            <p class="subtitle mt-3">
+                Machine Failure Prediction Using Machine Learning
+            </p>
+        </header>
+
+        <h2 class="section-title">Enter Machine Sensor Details</h2>
+
+        <form id="prediction-form" method="POST" action="/">
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+                    <label for="machine_type" class="form-label">
+                        Machine Type
+                    </label>
+
+                    <select class="form-select"
+                            id="machine_type"
+                            name="machine_type"
+                            required>
+                        <option value="L">Low (L)</option>
+                        <option value="M">Medium (M)</option>
+                        <option value="H">High (H)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="air_temp" class="form-label">
+                        Air Temperature (K)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="air_temp"
+                           name="air_temp"
+                           min="250"
+                           max="350"
+                           step="any"
+                           placeholder="Example: 303"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="process_temp" class="form-label">
+                        Process Temperature (K)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="process_temp"
+                           name="process_temp"
+                           min="250"
+                           max="400"
+                           step="any"
+                           placeholder="Example: 315"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="rotational_speed" class="form-label">
+                        Rotational Speed (rpm)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="rotational_speed"
+                           name="rotational_speed"
+                           min="1"
+                           max="10000"
+                           step="any"
+                           placeholder="Example: 1400"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="torque" class="form-label">
+                        Torque (Nm)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="torque"
+                           name="torque"
+                           min="0"
+                           max="200"
+                           step="any"
+                           placeholder="Example: 55"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="tool_wear" class="form-label">
+                        Tool Wear (minutes)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="tool_wear"
+                           name="tool_wear"
+                           min="0"
+                           max="1000"
+                           step="any"
+                           placeholder="Example: 200"
+                           required>
+                </div>
+
+            </div>
+
+            <button id="submit-button"
+                    type="submit"
+                    class="btn btn-primary w-100 mt-4">
+                Predict Machine Failure
+            </button>
+
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{{ url_for('batch_predict') }}"
+               class="btn btn-outline-primary">
+                Upload CSV for Batch Predictions
+            </a>
+
+            <a href="{{ url_for('dashboard') }}"
+               class="btn btn-outline-secondary">
+                View Model Dashboard
+            </a>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger error-card" role="alert">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        {% if prediction %}
+        <div class="result-card text-center">
+
+            <h2 class="result-title">Prediction Result</h2>
+
+            <h4 class="mt-4">{{ prediction }}</h4>
+
+            {% if probability is not none %}
+            <p class="mt-3 mb-2">
+                <strong>Failure Probability:</strong>
+                {{ "%.2f"|format(probability) }}%
+            </p>
+            {% endif %}
+
+            {% if risk_category %}
+            <p>
+                <strong>Risk Category:</strong>
+                <span class="badge
+                    {% if risk_category == 'High' %}
+                        text-bg-danger
+                    {% elif risk_category == 'Medium' %}
+                        text-bg-warning
+                    {% else %}
+                        text-bg-success
+                    {% endif %}">
+                    {{ risk_category }}
+                </span>
+            </p>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+        <footer class="footer-text text-center">
+            Predictive Maintenance System | Machine Learning Project
+        </footer>
+
+    </div>
+</div>
+
+<script>
+    const predictionForm = document.getElementById("prediction-form");
+    const submitButton = document.getElementById("submit-button");
+
+    predictionForm.addEventListener("submit", function () {
+        submitButton.disabled = true;
+        submitButton.textContent = "Processing Prediction...";
+    });
+</script>
+
+</body>
+</html>
